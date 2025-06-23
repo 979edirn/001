@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>989edirn - Portfolio</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css" />
+    <style>
+        * {
+            cursor: none !important;
+        }
+        @font-face {
+            font-family: 'Wedgie Regular';
+            src: url('fonts/wedgie-regular.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+        }
+        
+        h1, p {
+            font-family: 'Wedgie Regular', sans-serif;
+        }
+
+        body {
+            font-family: 'Wedgie Regular', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.4s ease;
+        }
+
+        #custom-pointer {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 50%;
+            z-index: 9999;
+            pointer-events: none;
+            transition: transform 0.1s ease, width 0.2s, height 0.2s;
+            transform: translate(-50%, -50%);
+            will-change: transform;
+        }
+
+        #works img,
+        #home img {
+            cursor: none;
+        }
+
+        header {
+            background-color: #ffffff;
+            color: #ffffff;
+            padding: 20px;
+            text-align: center;
+        }
+
+        footer {
+            background-color: #ffffff;
+            color: #130909;
+            padding: 10px;
+            text-align: center;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            transition: background-color 0.4s ease, color 0.4s ease;
+            z-index: 100;
+        }
+
+        .thumbnail {
+            width: 100%;
+            max-width: 200px;
+            display: block;
+            margin: 20px auto 0;
+            border-radius: 10px;
+            transition: transform 0.3s ease;
+        }
+        
+        .thumbnail:hover {
+            transform: scale(1.05);
+        }
+
+        .drawings {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 20px;
+            justify-content: center;
+            padding: 20px;
+            margin: 0 auto;
+        }
+        
+        .paintings {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 20px;
+            justify-content: center;
+            padding: 20px;
+            margin: 0 auto;
+        }
+
+        @media screen and (min-width: 768px) {
+            .drawings {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+            }
+            .paintings {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media screen and (max-width: 767px) {
+            .drawings, .paintings {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            .drawings, .paintings {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            }
+        }
+
+        .drawings img, .paintings img {
+            width: 100%;
+            max-width: 100%;
+            height: auto;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            opacity: 0;
+            will-change: transform, opacity;
+        }
+        
+        .drawings img.loaded, .paintings img.loaded {
+            opacity: 1;
+        }
+        
+        .drawings a:hover img, .paintings a:hover img {
+            transform: scale(1.03);
+        }
+
+        #works {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 100px 0 20%;
+            margin-left: 10px;
+        }
+
+        .toggle-container {
+            text-align: center;
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            cursor: none;
+            z-index: 1000;
+        }
+    
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+
+        input:checked+.slider {
+            background-color: #000000;
+        }
+
+        input:checked+.slider:before {
+            transform: translateX(26px);
+        }
+
+        input:checked~footer {
+            background-color: #000000;
+            color: #ffffff;
+        }
+
+        #thumbnail-container {
+            position: fixed;
+            left: 50%;
+            transform: translate(-50%, 0);
+            z-index: 9999;
+            max-width: 90%;
+        }
+
+       /* Custom preloader styles */
+       #loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            transition: opacity 0.8s ease, transform 0.5s ease;
+        }
+        
+        .loader-content {
+            text-align: center;
+            position: relative;
+            width: 200px;
+            height: 200px;
+        }
+        
+        .loader-frame {
+            width: 150px;
+            height: 150px;
+            position: relative;
+            margin: 0 auto 20px;
+            border: 2px solid #000;
+            overflow: hidden;
+        }
+        
+        .loader-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #f5f5f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .loader-sketch {
+            width: 0%;
+            height: 2px;
+            background-color: #000;
+            position: absolute;
+            top: 50%;
+            left: 0;
+            animation: sketch 2s ease-in-out infinite;
+        }
+        
+        .loader-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            transition: width 0.3s linear;
+        }
+        
+        #progress-text {
+            font-family: 'Wedgie Regular', sans-serif;
+            font-size: 24px;
+            margin-top: 10px;
+            transition: transform 0.3s ease;
+        }
+        
+        @keyframes sketch {
+            0% { width: 0%; left: 0; }
+            50% { width: 100%; left: 0; }
+            51% { width: 100%; left: auto; right: 0; }
+            100% { width: 0%; left: auto; right: 0; }
+        }
+        
+        .loader-pencil {
+            position: absolute;
+            width: 20px;
+            height: 60px;
+            top: 50%;
+            left: 0;
+            background-color: #000;
+            transform: translateY(-50%);
+            clip-path: polygon(0% 0%, 100% 0%, 100% 80%, 50% 100%, 0% 80%);
+            animation: pencilMove 2s ease-in-out infinite;
+        }
+        
+        @keyframes pencilMove {
+            0% { left: 0; }
+            50% { left: calc(100% - 20px); }
+            100% { left: 0; }
+        }
+        
+        /* Rest of your existing styles */
+        #custom-pointer {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 50%;
+            z-index: 9999;
+            pointer-events: none;
+            transition: transform 0.1s ease, width 0.2s, height 0.2s;
+            transform: translate(-50%, -50%);
+            will-change: transform;
+        }
+
+        .gallery-container {
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        
+        .gallery-container.visible {
+            opacity: 1;
+        }
+             /* Toggle Button */
+        .toggle-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, background-color 0.3s ease;
+            z-index: 1000;
+        }
+
+        .toggle-btn:hover {
+            transform: scale(1.05);
+            background-color: var(--secondary-color);
+        }
+
+        .toggle-btn i {
+            font-size: 24px;
+        }
+
+        /* Drawing Panel */
+        .drawing-panel {
+            position: fixed;
+            bottom: -100%;
+            left: 0;
+            width: 100%;
+            height: 80vh;
+            background-color: var(--panel-color);
+            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
+            transition: bottom 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
+        }
+
+        .drawing-panel.open {
+            bottom: 0;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .panel-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .panel-controls {
+            display: flex;
+            gap: 15px;
+        }
+
+        .panel-controls button {
+            background: none;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            color: #555;
+            transition: color 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .panel-controls button:hover {
+            color: var(--secondary-color);
+        }
+
+        .canvas-container {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #drawingCanvas {
+            background-color: #fff;
+            cursor: crosshair;
+        }
+
+        .tools {
+            position: absolute;
+            left: 20px;
+            top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .tool-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #fff;
+            border: 2px solid #eee;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tool-btn:hover, .tool-btn.active {
+            border-color: var(--secondary-color);
+            background-color: #f9f9f9;
+        }
+
+        .color-picker {
+            display: flex;
+            margin-top: 10px;
+            gap: 5px;
+        }
+
+        .color-option {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: transform 0.2s ease;
+        }
+
+        .color-option:hover, .color-option.active {
+            transform: scale(1.1);
+            border-color: #333;
+        }
+
+        /* 3D Pencil Cursor */
+        .custom-cursor {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            pointer-events: none;
+            z-index: 1001;
+            transition: transform 0.1s ease;
+            display: none;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div id="loader">
+        <div class="loader-content">
+            <div class="loader-frame">
+                <div class="loader-image">
+                    
+                </div>
+                <div class="loader-overlay"></div>
+                <div class="loader-sketch"></div>
+                <div class="loader-pencil"></div>
+            </div>
+            <p id="progress-text">0%</p>
+        </div>
+    </div>
+
+    <div id="custom-pointer"></div>
+    
+    <!-- Sezione Home-->
+    <section id="home">
+        <div id="thumbnail-container">
+            <a href="#" onclick="window.location.reload(); return false;">
+                <img class="thumbnail" src="s.jpg" alt="Immagine di presentazione">
+            </a>
+        </div>
+    </section>
+
+    <!-- Sezione Works 
+    <section id="works" class="gallery-container">
+        <div class="drawings" id="drawing-page">
+            <a href="copertina 1.jpg" data-fancybox="gallery">
+                <img src="copertina 1.jpg" alt="Drawing 21" class="lazy-load">
+            </a>
+            <a href="img039 copy.jpg" data-fancybox="gallery">
+                <img src="img039 copy.jpg" alt="Drawing 24" class="lazy-load">
+            </a>
+            <a href="img062 copy.jpg" data-fancybox="gallery">
+                <img src="img062 copy.jpg" alt="Drawing 24" class="lazy-load">
+            </a>
+            <a href="img065 copy.jpg" data-fancybox="gallery">
+                <img src="img065 copy.jpg" alt="Drawing 24" class="lazy-load">
+            </a>
+            <a href="disegni (12).jpg" data-fancybox="gallery">
+                <img src="disegni (12).jpg" alt="Drawing 22" class="lazy-load">
+            </a>
+            <a href="disegni (23).jpg" data-fancybox="gallery">
+                <img src="disedisegni (23).jpg" alt="Drawing 23" class="lazy-load">
+            </a>
+            <a href="blu (2).jpg" data-fancybox="gallery">
+                <img src="blu (2).jpg" alt="Disegno 1" class="lazy-load">
+            </a>
+            <a href="blu.jpg" data-fancybox="gallery">
+                <img src="blu.jpg" alt="Disegno 2" class="lazy-load">
+            </a>
+            <a href="rosso.jpg" data-fancybox="gallery">
+                <img src="rosso.jpg" alt="Disegno 3" class="lazy-load">
+            </a>
+            <a href="rosso11.jpg" data-fancybox="gallery">
+                <img src="rosso11.jpg" alt="Disegno 4" class="lazy-load">
+            </a>
+            <a href="rosso12.jpg" data-fancybox="gallery">
+                <img src="rosso12.jpg" alt="Disegno 5" class="lazy-load">
+            </a>
+            <a href="rosso3.jpg" data-fancybox="gallery">
+                <img src="rosso3.jpg" alt="Disegno 6" class="lazy-load">
+            </a>
+            <a href="rosso4.jpg" data-fancybox="gallery">
+                <img src="rosso4.jpg" alt="Disegno 7" class="lazy-load">
+            </a>
+            <a href="rosso5.jpg" data-fancybox="gallery">
+                <img src="/rosso5.jpg" alt="Disegno 8" class="lazy-load">
+            </a>
+            <a href="disegni/rosso6.jpg" data-fancybox="gallery">
+                <img src="disegni/rosso6.jpg" alt="Disegno 9" class="lazy-load">
+            </a>
+            <a href="disegni/rosso8.jpg" data-fancybox="gallery">
+                <img src="disegni/rosso8.jpg" alt="Disegno 10" class="lazy-load">
+            </a>
+            <a href="disegni/rosso9.jpg" data-fancybox="gallery">
+                <img src="disegni/rosso9.jpg" alt="Disegno 11" class="lazy-load">
+            </a>
+            <a href="disegni/nero.jpg" data-fancybox="gallery">
+                <img src="disegni/nero.jpg" alt="Disegno 12" class="lazy-load">
+            </a>
+            <a href="disegni/nero2.jpg" data-fancybox="gallery">
+                <img src="disegni/nero2.jpg" alt="Disegno 13" class="lazy-load">
+            </a>
+            <a href="disegni/nero5.jpg" data-fancybox="gallery">
+                <img src="disegni/nero5.jpg" alt="Disegno 14" class="lazy-load">
+            </a>
+            <a href="disegni/nero6.jpg" data-fancybox="gallery">
+                <img src="disegni/nero6.jpg" alt="Disegno 15" class="lazy-load">
+            </a>
+            <a href="disegni/disegni (1).jpg" data-fancybox="gallery">
+                <img src="disegni/disegni (1).jpg" alt="Disegno 17" class="lazy-load">
+            </a>
+            <a href="disegni/GG.jpg" data-fancybox="gallery">
+                <img src="disegni/GG.jpg" alt="Disegno 18" class="lazy-load">
+            </a>
+            <a href="disegni/f.jpg" data-fancybox="gallery">
+                <img src="disegni/f.jpg" alt="Disegno 19" class="lazy-load">
+            </a>
+            <a href="disegni/r.jpg" data-fancybox="gallery">
+                <img src="disegni/r.jpg" alt="Disegno 20" class="lazy-load">
+            </a>
+            <a href="disegni/y.jpg" data-fancybox="gallery">
+                <img src="disegni/y.jpg" alt="Drawing 24" class="lazy-load">
+            </a>
+            <a href="disegni/img004.jpg" data-fancybox="gallery">
+                <img src="disegni/img004.jpg" alt="Drawing 24" class="lazy-load">
+            </a>
+            <a href="disegni/img010.jpg" data-fancybox="gallery">
+                <img src="disegni/img010.jpg" alt="Drawing 24" class="lazy-load">
+            </a>
+            <a href="disegni/copertina fine.jpg" data-fancybox="gallery">
+                <img src="disegni/copertina fine.jpg" alt="Drawing 24" class="lazy-load">
+            </a>
+        </div>
+-->
+        <div class="paintings">
+             <a href="TRA4.png" data-fancybox="gallery">
+                <img src="TRA4.png" alt="paintings 1" class="lazy-load">
+            </a>
+           
+            <a href="Black Modern Vlogger YouTube Banner.png" data-fancybox="gallery">
+                <img src="Black Modern Vlogger YouTube Banner.png" alt="paintings 1" class="lazy-load">
+            </a>
+            <!--
+           
+            <a href="quadri/b.JPG" data-fancybox="gallery">
+                <img src="quadri/b.JPG" alt="paintings 2" class="lazy-load">
+            </a>
+            <a href="quadri/quadro1.JPG" data-fancybox="gallery">
+                <img src="quadri/quadro1.JPG" alt="paintings 1" class="lazy-load">
+            </a>
+            <a href="quadri/AIR FORCE.png" data-fancybox="gallery">
+                <img src="quadri/AIR FORCE.png" alt="paintings 3" class="lazy-load">
+            </a>
+            <a href="quadri/dccssdf.PNG" data-fancybox="gallery">
+                <img src="quadri/dccssdf.PNG" alt="paintings 1" class="lazy-load">
+            </a>
+            <a href="quadri/d.png" data-fancybox="gallery">
+                <img src="quadri/d.png" alt="paintings 10" class="lazy-load">
+            </a> --> 
+            <a href="a.png" data-fancybox="gallery">
+                <img src="a.png" alt="paintings 12" class="lazy-load">
+            </a> 
+            <!--            <a href="quadri/ciao.JPG" data-fancybox="gallery">
+                <img src="quadri/ciao.JPG" alt="paintings 4" class="lazy-load">
+            </a>
+            <a href="quadri/f.png" data-fancybox="gallery">
+                <img src="quadri/f.png" alt="paintings 11" class="lazy-load">
+            </a>
+            <a href="quadri/AD.png" data-fancybox="gallery">
+                <img src="quadri/AD.png" alt="paintings 5" class="lazy-load">
+            </a>
+            <a href="quadri/AS.png" data-fancybox="gallery">
+                <img src="quadri/AS.png" alt="paintings 6" class="lazy-load">
+            </a>
+            <a href="quadri/DA.png" data-fancybox="gallery">
+                <img src="quadri/DA.png" alt="paintings 7" class="lazy-load">
+            </a>
+            <a href="quadri/IMG_0150.png" data-fancybox="gallery">
+                <img src="quadri/IMG_0150.png" alt="paintings 10" class="lazy-load">
+            </a>
+            <a href="quadri/canne.png" data-fancybox="gallery">
+                <img src="quadri/canne.png" alt="paintings 9" class="lazy-load">
+            </a>
+            <a href="quadri/disegni (26).jpg" data-fancybox="gallery">
+                <img src="quadri/disegni (26).jpg" alt="paintings 10" class="lazy-load">
+            </a>
+        </div> -->
+
+          
+        <footer>
+            <div>
+                <p>&copy; 2024 989edirn. Tutti i diritti riservati. Instagram: 989edirn</p>
+            </div>
+        </footer>
+    </section>
+
+    <div class="toggle-container">
+        <label class="switch">
+            <input type="checkbox" id="toggleSwitch">
+            <span class="slider round"></span>
+        </label>
+    </div>
+    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+    <!-- JavaScript for the loader -->
+    <script>
+        // Modified preload function
+        function preloadImagesWithPriority(imagePaths, onComplete) {
+            const loader = document.getElementById('loader');
+            const progressText = document.getElementById('progress-text');
+            const loaderOverlay = document.querySelector('.loader-overlay');
+            
+            let loadedCount = 0;
+            const totalImages = imagePaths.allImages.length;
+            const priorityImagesCount = imagePaths.priorityImages.length;
+            
+            // Preload priority images first
+            const preloadPriorityImages = () => {
+                let priorityLoaded = 0;
+                
+                imagePaths.priorityImages.forEach(url => {
+                    const img = new Image();
+                    img.src = url;
+                    img.onload = img.onerror = () => {
+                        priorityLoaded++;
+                        loadedCount++;
+                        
+                        // Update loading percentage
+                        const percentage = Math.round((loadedCount / totalImages) * 100);
+                        progressText.textContent = `${percentage}%`;
+                        loaderOverlay.style.width = `${percentage}%`;
+                        
+                        // Apply a subtle animation to the progress text
+                        progressText.style.transform = 'scale(1.1)';
+                        setTimeout(() => {
+                            progressText.style.transform = 'scale(1)';
+                        }, 200);
+                        
+                         if (priorityLoaded === priorityImagesCount) {
+                            // Show gallery once priority images are loaded
+                            document.querySelector('.gallery-container').classList.add('visible');
+                            
+                            // Start loading remaining images
+                            preloadRemainingImages();
+                        }
+                    };
+                });
+            };
+            
+            // Then load all other images
+            const preloadRemainingImages = () => {
+                const remainingImages = imagePaths.allImages.filter(
+                    img => !imagePaths.priorityImages.includes(img)
+                );
+                
+                if (remainingImages.length === 0) {
+                    finishLoading();
+                    return;
+                }
+                
+                // Load images in batches
+                const batchSize = 5;
+                let currentBatch = 0;
+                
+                function loadBatch() {
+                    const start = currentBatch * batchSize;
+                    const end = Math.min(start + batchSize, remainingImages.length);
+                    const batch = remainingImages.slice(start, end);
+                    
+                    if (batch.length === 0) {
+                        finishLoading();
+                        return;
+                    }
+                    
+                    let batchLoaded = 0;
+                    
+                    batch.forEach(url => {
+                        const img = new Image();
+                        img.src = url;
+                        img.onload = img.onerror = () => {
+                            batchLoaded++;
+                            loadedCount++;
+                            
+                            // Update loading percentage
+                            const percentage = Math.round((loadedCount / totalImages) * 100);
+                            progressText.textContent = `${percentage}%`;
+                            loaderOverlay.style.width = `${percentage}%`;
+                            
+                            // Apply a subtle animation to the progress text
+                            progressText.style.transform = 'scale(1.1)';
+                            setTimeout(() => {
+                                progressText.style.transform = 'scale(1)';
+                            }, 200);
+                            
+                            if (batchLoaded === batch.length) {
+                                currentBatch++;
+                                setTimeout(loadBatch, 100);
+                            }
+                        };
+                    });
+                }
+                
+                loadBatch();
+            };
+            
+            function finishLoading() {
+                // Final animation for the loader
+                progressText.textContent = '100%';
+                loaderOverlay.style.width = '100%';
+                
+                // Add a dramatic exit animation
+                setTimeout(() => {
+                    loader.style.opacity = '0';
+                    loader.style.transform = 'translateY(-20px)';
+                    setTimeout(() => {
+                        loader.style.display = 'none';
+                        onComplete();
+                    }, 800);
+                }, 500);
+            }
+            
+            // Start with priority images
+            preloadPriorityImages();
+        }
+        
+        // The rest of your JavaScript code remains the same
+    </script>
+    <script>
+        // Ottieni tutti i percorsi delle immagini per il precaricamento
+        function getAllImagePaths() {
+            const allImages = [];
+            
+            // Immagine principale
+            allImages.push('s.jpg');
+            
+            // Immagini prioritarie (le prime che verranno mostrate)
+            const priorityImages = [
+                'disegni/copertina 1.jpg',
+                'disegni/img039 copy.jpg',
+                'disegni/img062 copy.jpg',
+                'disegni/img065 copy.jpg',
+                'quadri/TRA4.png',
+                'quadri/Black Modern Vlogger YouTube Banner.png'
+            ];
+            
+            priorityImages.forEach(img => allImages.push(img));
+            
+            // Trova tutte le immagini nei link della galleria
+            document.querySelectorAll('a[data-fancybox="gallery"]').forEach(link => {
+                const imgPath = link.getAttribute('href');
+                if (!priorityImages.includes(imgPath)) {
+                    allImages.push(imgPath);
+                }
+            });
+            
+            return {
+                priorityImages: priorityImages,
+                allImages: allImages
+            };
+        }
+        
+        // Gestore del precaricamento ottimizzato con IntersectionObserver
+        function initImageLazyLoading() {
+            const options = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.1
+            };
+            
+            const lazyLoadObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const img = entry.target;
+                        const src = img.getAttribute('src');
+                        
+                        // Carica l'immagine effettivamente
+                        const tempImg = new Image();
+                        tempImg.src = src;
+                        tempImg.onload = () => {
+                            img.classList.add('loaded');
+                        };
+                        
+                        observer.unobserve(img);
+                    }
+                }); 
+            }, options);
+            
+            // Osserva tutte le immagini con classe lazy-load
+            document.querySelectorAll('img.lazy-load').forEach(img => {
+                lazyLoadObserver.observe(img);
+            });
+        }
+        
+        // Precarica le immagini con priorità
+        function preloadImagesWithPriority(imagePaths, onComplete) {
+            const loader = document.getElementById('loader');
+            const progressText = document.getElementById('progress-text');
+            
+            let loadedCount = 0;
+            const totalImages = imagePaths.allImages.length;
+            const priorityImagesCount = imagePaths.priorityImages.length;
+            
+            // Prima carica le immagini prioritarie
+            const preloadPriorityImages = () => {
+                let priorityLoaded = 0;
+                
+                imagePaths.priorityImages.forEach(url => {
+                    const img = new Image();
+                    img.src = url;
+                    img.onload = img.onerror = () => {
+                        priorityLoaded++;
+                        loadedCount++;
+                        
+                        // Aggiorna la percentuale di caricamento
+                        const percentage = Math.round((loadedCount / totalImages) * 100);
+                        progressText.textContent = `${percentage}%`;
+                        
+                        if (priorityLoaded === priorityImagesCount) {
+                            // Mostra la galleria una volta caricate le immagini prioritarie
+                            document.querySelector('.gallery-container').classList.add('visible');
+                            
+                            // Inizia a caricare il resto delle immagini
+                            preloadRemainingImages();
+                        }
+                    };
+                });
+            };
+            
+            // Poi carica tutte le altre immagini
+            const preloadRemainingImages = () => {
+                const remainingImages = imagePaths.allImages.filter(
+                    img => !imagePaths.priorityImages.includes(img)
+                );
+                
+                // Se non ci sono altre immagini, completa
+                if (remainingImages.length === 0) {
+                    setTimeout(() => {
+                        loader.style.opacity = '0';
+                        setTimeout(() => {
+                            loader.style.display = 'none';
+                        }, 500);
+                        onComplete();
+                    }, 500);
+                    return;
+                }
+                
+                // Carica le immagini rimanenti a gruppi per non sovraccaricare
+                const batchSize = 5;
+                let currentBatch = 0;
+                
+                function loadBatch() {
+                    const start = currentBatch * batchSize;
+                    const end = Math.min(start + batchSize, remainingImages.length);
+                    const batch = remainingImages.slice(start, end);
+                    
+                    if (batch.length === 0) {
+                        // Tutte le immagini sono state caricate
+                        setTimeout(() => {
+                            loader.style.opacity = '0';
+                            setTimeout(() => {
+                                loader.style.display = 'none';
+                            }, 500);
+                            onComplete();
+                        }, 500);
+                        return;
+                    }
+                    
+                    let batchLoaded = 0;
+                    
+                    batch.forEach(url => {
+                        const img = new Image();
+                        img.src = url;
+                        img.onload = img.onerror = () => {
+                            batchLoaded++;
+                            loadedCount++;
+                            
+                            // Aggiorna la percentuale di caricamento
+                            const percentage = Math.round((loadedCount / totalImages) * 100);
+                            progressText.textContent = `${percentage}%`;
+                            
+                            if (batchLoaded === batch.length) {
+                                currentBatch++;
+                                setTimeout(loadBatch, 100); // Piccolo ritardo tra i batch
+                            }
+                        };
+                    });
+                }
+                
+                loadBatch();
+            };
+            
+            // Inizia con le immagini prioritarie
+            preloadPriorityImages();
+        }
+        
+        // Ottimizza il puntatore personalizzato
+        function initCustomPointer() {
+            const customPointer = document.getElementById('custom-pointer');
+            let pointerX = 0;
+            let pointerY = 0;
+            let mouseX = 0;
+            let mouseY = 0;
+            
+            // Usa una variabile per tracciare se il mouse è sopra un link o un'immagine
+            let isOverInteractive = false;
+            
+            document.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+                
+                // Controlla se il mouse è sopra un elemento interattivo
+                const element = document.elementFromPoint(mouseX, mouseY);
+                const isOverImg = element && (element.tagName === 'IMG' || element.closest('a'));
+                
+                if (isOverImg !== isOverInteractive) {
+                    isOverInteractive = isOverImg;
+                    
+                    if (isOverInteractive) {
+                        // Ingrandisci il puntatore sopra elementi interattivi
+                        customPointer.style.width = '25px';
+                        customPointer.style.height = '25px';
+                        customPointer.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+                    } else {
+                        // Ritorna alla dimensione normale
+                        customPointer.style.width = '20px';
+                        customPointer.style.height = '20px';
+                        customPointer.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+                    }
+                }
+            });
+            
+            // Aggiorna la posizione del puntatore con requestAnimationFrame per prestazioni ottimali
+            function updatePointer() {
+                pointerX += (mouseX - pointerX) * 0.2;
+                pointerY += (mouseY - pointerY) * 0.2;
+                
+                customPointer.style.transform = `translate(${pointerX}px, ${pointerY}px)`;
+                requestAnimationFrame(updatePointer);
+            }
+            
+            updatePointer();
+        }
+        
+        // Inizializza FancyBox con opzioni ottimizzate
+        function initFancyBox() {
+            $("[data-fancybox]").fancybox({
+                loop: true,
+                buttons: ["zoom", "slideShow", "thumbs", "close"],
+                animationEffect: "fade",
+                transitionEffect: "fade",
+                preventCaptionOverlap: true,
+                idleTime: 3,
+                gutter: 50,
+                // Precarica la prossima immagine nella galleria
+                beforeLoad: function(instance, slide) {
+                    // Precarica la prossima immagine
+                    const nextSlide = instance.group[slide.index + 1] || instance.group[0];
+                    if (nextSlide) {
+                        const preloadImg = new Image();
+                        preloadImg.src = nextSlide.src;
+                    }
+                }
+            });
+        }
+        
+        // Gestore tema chiaro/scuro
+        function initThemeToggle() {
+            const toggleSwitch = document.getElementById('toggleSwitch');
+            const customPointer = document.getElementById('custom-pointer');
+            
+            toggleSwitch.addEventListener('change', function() {
+                if (this.checked) {
+                    document.body.style.backgroundColor = '#000';
+                    customPointer.style.backgroundColor = 'rgba(255, 255, 0, 0.7)'; // Giallo per tema scuro
+                    document.body.classList.add('dark-mode');
+                } else {
+                    document.body.style.backgroundColor = '#fff';
+                    customPointer.style.backgroundColor = 'rgba(0, 0, 0, 0.7)'; // Nero per tema chiaro
+                    document.body.classList.remove('dark-mode');
+                }
+            });
+            
+            // Imposta il tema iniziale
+            toggleSwitch.dispatchEvent(new Event('change'));
+        }
+        
+        // Gestisci la visualizzazione del thumbnail e footer durante lo scroll
+        function initScrollBehavior() {
+            const thumbnailContainer = document.getElementById('thumbnail-container');
+            const footer = document.querySelector('footer');
+            
+            window.addEventListener('scroll', function() {
+                const scrollY = window.scrollY;
+                
+                if (scrollY > 100) {
+                    thumbnailContainer.style.opacity = '0';
+                    thumbnailContainer.style.pointerEvents = 'none';
+                    footer.style.opacity = '0';
+                    footer.style.pointerEvents = 'none';
+                } else {
+                    thumbnailContainer.style.opacity = '1';
+                    thumbnailContainer.style.pointerEvents = 'auto';
+                    footer.style.opacity = '1';
+                    footer.style.pointerEvents = 'auto';
+                }
+            });
+        }
+        
+        // Inizializza quando il DOM è pronto
+        document.addEventListener('DOMContentLoaded', function() {
+            // Ottieni tutti i percorsi delle immagini
+            const imagePaths = getAllImagePaths();
+            
+            // Inizializza il puntatore personalizzato
+            initCustomPointer();
+            
+            // Inizializza FancyBox
+            initFancyBox();
+            
+            // Inizializza il toggle tema
+            initThemeToggle();
+            
+            // Inizializza il comportamento di scroll
+            initScrollBehavior();
+            
+            // Inizializza il lazy loading delle immagini
+            initImageLazyLoading();
+            
+            // Precarica le immagini
+            preloadImagesWithPriority(imagePaths, function() {
+                console.log('Tutte le immagini sono state precaricate con successo!');
+            });
+        });
+    </script>
+</body>
+</html>
